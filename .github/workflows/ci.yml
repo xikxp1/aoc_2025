@@ -29,5 +29,3 @@ jobs:
               run: cargo clippy -- -D warnings
             - name: cargo fmt
               run: cargo fmt --check
-            - name: cargo time
-              run: cargo time --store
