@@ -12,7 +12,7 @@ pub fn part_one(input: &str) -> Option<u64> {
         let dir = token.chars().next().unwrap();
         let num_str = &token[1..];
         let x = num_str.parse::<i64>().unwrap();
-        
+
         match dir {
             'L' => {
                 cur = (cur - x) % 100;
@@ -86,12 +86,12 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(3));
     }
 
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(6));
     }
 }
