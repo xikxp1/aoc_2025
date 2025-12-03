@@ -49,14 +49,10 @@ pub fn part_two(input: &str) -> Option<u64> {
             for digit in (0..=9).rev() {
                 let index = find_digit(token, digit, start_idx, token.len() - i);
                 if let Some(x) = index {
-                    // println!("digit: {}, x: {}", digit, x);
                     sum = sum * 10 + digit as u64;
                     start_idx = x + 1;
                     break;
                 }
-            }
-            if start_idx >= token.len() {
-                break;
             }
         }
         total += sum;
