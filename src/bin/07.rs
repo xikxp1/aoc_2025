@@ -1,35 +1,28 @@
-use std::collections::HashSet;
-
 advent_of_code::solution!(7);
 
 pub fn part_one(input: &str) -> Option<u64> {
     let mut result: u64 = 0;
-    let mut ray_positions: HashSet<usize> = HashSet::new();
+    let mut ray_positions: Vec<bool> = Vec::new();
     for (i, line) in input.lines().enumerate() {
         match i {
             0 => {
-                for (j, c) in line.chars().enumerate() {
-                    if c == 'S' {
-                        ray_positions.insert(j);
-                        break;
-                    }
+                for c in line.chars() {
+                    ray_positions.push(c == 'S');
                 }
             }
             _ => {
-                let mut new_positions: HashSet<usize> = ray_positions.clone();
                 for (j, c) in line.chars().enumerate() {
-                    if c == '^' && ray_positions.contains(&j) {
-                        if j > 0 && !ray_positions.contains(&(j - 1)) {
-                            new_positions.insert(j - 1);
+                    if c == '^' && ray_positions[j] {
+                        if j > 0 && !ray_positions[j - 1] {
+                            ray_positions[j - 1] = true;
                         }
-                        if j < line.len() - 1 && !ray_positions.contains(&(j + 1)) {
-                            new_positions.insert(j + 1);
+                        if j < line.len() - 1 && !ray_positions[j + 1] {
+                            ray_positions[j + 1] = true;
                         }
-                        new_positions.remove(&j);
+                        ray_positions[j] = false;
                         result += 1;
                     }
                 }
-                ray_positions = new_positions;
             }
         }
     }
@@ -46,19 +39,17 @@ pub fn part_two(input: &str) -> Option<u64> {
                 }
             }
             _ => {
-                let mut new_weights: Vec<u64> = ray_weights.clone();
                 for (j, c) in line.chars().enumerate() {
                     if c == '^' {
-                        new_weights[j] = 0;
                         if j > 0 {
-                            new_weights[j - 1] += ray_weights[j];
+                            ray_weights[j - 1] += ray_weights[j];
                         }
                         if j < line.len() - 1 {
-                            new_weights[j + 1] += ray_weights[j];
+                            ray_weights[j + 1] += ray_weights[j];
                         }
+                        ray_weights[j] = 0;
                     }
                 }
-                ray_weights = new_weights;
             }
         }
     }
