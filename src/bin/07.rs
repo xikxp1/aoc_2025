@@ -10,7 +10,7 @@ pub fn part_one(input: &str) -> Option<u64> {
                     ray_positions.push(c == 'S');
                 }
             }
-            _ => {
+            i if i % 2 == 0 => {
                 for (j, c) in line.chars().enumerate() {
                     if c == '^' && ray_positions[j] {
                         if j > 0 && !ray_positions[j - 1] {
@@ -24,6 +24,7 @@ pub fn part_one(input: &str) -> Option<u64> {
                     }
                 }
             }
+            _ => continue,
         }
     }
     Some(result)
@@ -38,7 +39,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                     ray_weights.push(if c == 'S' { 1 } else { 0 });
                 }
             }
-            _ => {
+            i if i % 2 == 0 => {
                 for (j, c) in line.chars().enumerate() {
                     if c == '^' {
                         if j > 0 {
@@ -51,6 +52,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                     }
                 }
             }
+            _ => continue,
         }
     }
     Some(ray_weights.iter().sum::<u64>())
