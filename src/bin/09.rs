@@ -126,14 +126,12 @@ pub fn part_two(input: &str) -> Option<u64> {
             let height = (ys[yi + 1] - ys[yi]) as u64;
             let cell_area = width * height;
             let add = if filled[xi][yi] { cell_area } else { 0 };
-            prefix[xi + 1][yi + 1] =
-                prefix[xi][yi + 1] + prefix[xi + 1][yi] - prefix[xi][yi] + add;
+            prefix[xi + 1][yi + 1] = prefix[xi][yi + 1] + prefix[xi + 1][yi] - prefix[xi][yi] + add;
         }
     }
 
-    let find_idx = |vals: &Vec<i64>, v: i64| -> usize {
-        vals.binary_search(&v).expect("coord present")
-    };
+    let find_idx =
+        |vals: &Vec<i64>, v: i64| -> usize { vals.binary_search(&v).expect("coord present") };
 
     let mut max_area = 0u64;
 
