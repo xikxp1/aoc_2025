@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use petgraph::{Directed, Graph, graph::NodeIndex};
+use petgraph::{Directed, Graph, algo::toposort, graph::NodeIndex};
 
 advent_of_code::solution!(11);
 
@@ -67,46 +67,60 @@ fn parse_graph(
     }
 }
 
-fn count_paths(
+fn count_paths_with_required(
     graph: &Graph<String, (), Directed>,
-    from: NodeIndex,
-    to: NodeIndex,
-    visited: &mut HashSet<NodeIndex>,
-    to_visit: &mut HashSet<NodeIndex>,
+    start: NodeIndex,
+    end: NodeIndex,
+    required: &[NodeIndex],
 ) -> u64 {
-    if from == to {
-        return to_visit.is_empty() as u64;
-    }
+    let mut required_nodes = required.to_vec();
+    required_nodes.sort_by_key(|n| n.index());
 
-    visited.insert(from);
+    let required_index: HashMap<NodeIndex, usize> = required_nodes
+        .iter()
+        .copied()
+        .enumerate()
+        .map(|(i, node)| (node, i))
+        .collect();
 
-    let mut total_paths = 0;
+    let required_count = required_nodes.len();
+    let state_size = 1usize << required_count;
+    let full_mask = state_size - 1;
 
-    for neighbor in graph.neighbors(from) {
-        if !visited.contains(&neighbor) {
-            let removed = to_visit.remove(&neighbor);
-            total_paths += count_paths(graph, neighbor, to, visited, to_visit);
-            if removed {
-                to_visit.insert(neighbor);
+    let order = toposort(graph, None).expect("graph contains a cycle");
+
+    let mut ways = vec![vec![0u64; state_size]; graph.node_count()];
+
+    let start_mask = required_index.get(&start).map(|i| 1usize << i).unwrap_or(0);
+    ways[start.index()][start_mask] = 1;
+
+    for node in order {
+        let node_idx = node.index();
+        for mask in 0..state_size {
+            let count = ways[node_idx][mask];
+            if count == 0 {
+                continue;
+            }
+            for neighbor in graph.neighbors(node) {
+                let mut next_mask = mask;
+                if let Some(&bit) = required_index.get(&neighbor) {
+                    next_mask |= 1 << bit;
+                }
+                ways[neighbor.index()][next_mask] += count;
             }
         }
     }
 
-    visited.remove(&from);
-
-    total_paths
+    ways[end.index()][full_mask]
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
     let parsed_graph = parse_graph(input, "you", "out", vec![]);
-    let mut visited = HashSet::new();
-    let mut to_visit = HashSet::new();
-    Some(count_paths(
+    Some(count_paths_with_required(
         &parsed_graph.graph,
         parsed_graph.start_node,
         parsed_graph.end_node,
-        &mut visited,
-        &mut to_visit,
+        &[],
     ))
 }
 
@@ -117,14 +131,13 @@ pub fn part_two(input: &str) -> Option<u64> {
         "out",
         vec!["fft".to_string(), "dac".to_string()],
     );
-    println!("{:?}", parsed_graph);
-    let mut visited = HashSet::new();
-    Some(count_paths(
+    let mut required: Vec<_> = parsed_graph.to_visit.iter().copied().collect();
+    required.sort_by_key(|n| n.index());
+    Some(count_paths_with_required(
         &parsed_graph.graph,
         parsed_graph.start_node,
         parsed_graph.end_node,
-        &mut visited,
-        &mut parsed_graph.to_visit.clone(),
+        &required,
     ))
 }
 
@@ -145,7 +158,6 @@ mod tests {
         let result = part_two(&advent_of_code::template::read_file_part(
             "examples", DAY, 2,
         ));
-        // TODO: optimize for part two
         assert_eq!(result, Some(2));
     }
 }
