@@ -112,13 +112,11 @@ fn solve_machine_with_joltage(input: &str) -> Option<u64> {
     let matrix = build_matrix(&machine.buttons, machine.num_lights);
 
     match gauss_eliminate(&matrix, &machine.joltage) {
-        Some((x0, _)) => {
-            Some(u64::try_from(l1_norm(&x0)).ok()?)
-        }
+        Some((x0, _)) => Some(u64::try_from(l1_norm(&x0)).ok()?),
         None => {
             println!("No solution found for {:?}", machine);
             None
-        },
+        }
     }
 }
 
