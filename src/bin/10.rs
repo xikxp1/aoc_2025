@@ -264,7 +264,7 @@ fn gauss_eliminate(a: &[Vec<u8>], b: &[u64]) -> Option<(Vec<i64>, Vec<Vec<i64>>)
         let mut sum = aug[i][n];
 
         for j in (col + 1)..n {
-            sum -= aug[i][j] * x0[j] as i64;
+            sum -= aug[i][j] * x0[j];
         }
 
         if aug[i][col] == 0 || sum % aug[i][col] != 0 {
@@ -299,7 +299,7 @@ fn gauss_eliminate(a: &[Vec<u8>], b: &[u64]) -> Option<(Vec<i64>, Vec<Vec<i64>>)
 
             for j in (col + 1)..n {
                 if j != free_col {
-                    sum -= aug[i][j] * v[j] as i64;
+                    sum -= aug[i][j] * v[j];
                 }
             }
 
